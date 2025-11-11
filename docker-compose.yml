@@ -1,0 +1,35 @@
+services:
+  # 1. ZooKeeper (Управляет метаданными Kafka)
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: zookeeper
+    ports:
+      - "2181:2181" # Порт ZooKeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  # 2. Kafka Broker
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka-broker
+    ports:
+      # Главный порт, который слушают ваши Spring-приложения
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      # Указываем Kafka, где найти ZooKeeper, используя внутреннее имя сервиса 'zookeeper'
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+
+      # Настройка слушателей:
+      KAFKA_LISTENERS: PLAINTEXT_HOST://0.0.0.0:29092,PLAINTEXT://0.0.0.0:9092
+
+      # Crucial: Kafka рекламирует этот адрес внешним клиентам.
+      # Ваши Spring-приложения ищут Kafka по адресу 'localhost:9092'.
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT_HOST://kafka:29092,PLAINTEXT://localhost:9092
+
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT_HOST:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
