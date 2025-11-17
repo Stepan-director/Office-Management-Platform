@@ -38,6 +38,9 @@ public class AuthService {
 
     private Random random = new Random();
 
+
+    // это тоже делает только админ
+    // также preauthorize, настраиваем security, но у нас уже не надо здесь токены использовать, наверно
     @Transactional
     public AuthUser registerUser(RegisterRequest request) {
         String employeeId;
@@ -75,7 +78,6 @@ public class AuthService {
 
         return savedUser;
     }
-
 
     private String generateEmployeeId(Role role) {
         String prefix = "EMP";

@@ -41,7 +41,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // ДОБАВЬ ЭТОТ МЕТОД - конвертер ролей
     private Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter() {
         JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
         jwtConverter.setJwtGrantedAuthoritiesConverter(new RoleConverter());
