@@ -27,12 +27,12 @@ Booking Service:
 Базы данных - раздельные PostgreSQL для каждого сервиса
 
 Технологии:
-Java 17+;
-Spring Boot 3.x;
-Spring Security - аутентификация и авторизация(базовый уровень);
-JWT (jjwt) - токены для stateless аутентификации(базовый уровень);
-Spring Data JPA;
-PostgreSQL;
-Apache Kafka - асинхронная коммуникация между сервисами;
-Docker - для настройки Kafka, ZooKeeper;
-Postman - тестирование.
+- Java 17+;
+- Spring Boot 3.x;
+- Spring Security - аутентификация и авторизация(базовый уровень);
+- JWT (jjwt) - токены для stateless аутентификации(базовый уровень);
+- Spring Data JPA;
+- PostgreSQL;
+- Apache Kafka - асинхронная коммуникация между сервисами;
+- Docker - для настройки Kafka, ZooKeeper;
+- Postman - тестирование.
