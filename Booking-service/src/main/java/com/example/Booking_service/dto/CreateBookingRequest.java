@@ -6,15 +6,15 @@ import java.time.LocalTime;
 
 // это будет на фронтенде
 public class CreateBookingRequest {
-    private String userId;
+    private String employeeId;
     private String workplaceId;
     private int floor;
     private Status status;
     private LocalTime startBooking;
     private LocalTime endBooking;
 
-    public CreateBookingRequest(String userId, String workplaceId, int floor, Status status, LocalTime startBooking, LocalTime endBooking) {
-        this.userId = userId;
+    public CreateBookingRequest(String employeeId, String workplaceId, int floor, Status status, LocalTime startBooking, LocalTime endBooking) {
+        this.employeeId = employeeId;
         this.workplaceId = workplaceId;
         this.floor = floor;
         this.status = status;
@@ -25,12 +25,12 @@ public class CreateBookingRequest {
     public CreateBookingRequest() {
     }
 
-    public String getUserId() {
-        return userId;
+    public String getEmployeeId() {
+        return employeeId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setEmployeeId(String employeeId) {
+        this.employeeId = employeeId;
     }
 
     public String getWorkplaceId() {

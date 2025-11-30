@@ -5,6 +5,7 @@ import com.example.User_service.dto.UserProfileResponse;
 import com.example.User_service.model.User;
 import com.example.User_service.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,6 +13,7 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
 
     public User createUserProfile(CreateProfileRequest request){
 
@@ -35,6 +37,5 @@ public class UserService {
 
         return new UserProfileResponse(user);
     }
-
 
 }

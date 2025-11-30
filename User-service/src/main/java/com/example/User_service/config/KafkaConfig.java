@@ -1,7 +1,5 @@
-package com.example.Booking_service.config;
+package com.example.User_service.config;
 
-import com.example.Booking_service.dto.WorkspaceCreatedEvent;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -12,12 +10,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.*;
-import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import java.util.HashMap;
 import java.util.Map;
-
 
 @Configuration
 public class KafkaConfig {
@@ -26,7 +22,7 @@ public class KafkaConfig {
     public ConsumerFactory<String, String> consumerFactory(){
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        configProps.put(ConsumerConfig.GROUP_ID_CONFIG, "booking-service-group");
+        configProps.put(ConsumerConfig.GROUP_ID_CONFIG, "user-booking");
         configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         configProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
@@ -34,31 +30,11 @@ public class KafkaConfig {
         return new DefaultKafkaConsumerFactory<>(configProps);
     }
 
+    // сообщение получаем из Booking
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory(){
         ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         return factory;
-    }
-
-    @Bean
-    public ProducerFactory<String, Object> producerFactory() {
-        Map<String, Object> configProps = new HashMap<>();
-
-        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-
-        return new DefaultKafkaProducerFactory<>(configProps);
-    }
-
-    @Bean
-    public KafkaTemplate<String, Object> kafkaTemplate(){
-        return new KafkaTemplate<>(producerFactory());
-    }
-
-    @Bean
-    public NewTopic userBooking(){
-        return TopicBuilder.name("user-booking").partitions(1).replicas(1).build();
     }
 }

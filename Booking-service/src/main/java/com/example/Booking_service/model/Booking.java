@@ -14,8 +14,8 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id", nullable = true)
-    private String userId; // личный табельный номер из auth service
+    @Column(name = "employee_id", nullable = true) // исравить на employeeId
+    private String employeeId; // личный табельный номер из auth service
 
     @Column(name = "workplace_id", nullable = false)
     private String workplaceId; // номер места из workspace service
@@ -27,15 +27,15 @@ public class Booking {
 
     private LocalDate date; // дата брони места
 
-    @Column(name = "start_booking")
+    @Column(name = "start_booking", nullable = false)
     private LocalTime startBooking; // начало брони
 
-    @Column(name = "end_booking")
+    @Column(name = "end_booking", nullable = false)
     private LocalTime endBooking; // конец брони
 
-    public Booking(Long id, String userId, String workplaceId, int floor, Status status, LocalDate date, LocalTime startBooking, LocalTime endBooking) {
+    public Booking(Long id, String employeeId, String workplaceId, int floor, Status status, LocalDate date, LocalTime startBooking, LocalTime endBooking) {
         this.id = id;
-        this.userId = userId;
+        this.employeeId = employeeId;
         this.workplaceId = workplaceId;
         this.floor = floor;
         this.status = status;
@@ -55,12 +55,12 @@ public class Booking {
         this.id = id;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getEmployeeId() {
+        return employeeId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setEmployeeId(String employeeId) {
+        this.employeeId = employeeId;
     }
 
     public String getWorkplaceId() {

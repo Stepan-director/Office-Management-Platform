@@ -30,6 +30,7 @@ public class JwtUtil {
     public String generateToken(AuthUser user) {
         return Jwts.builder()
                 .subject(user.getEmployeeId())
+                .claim("employeeId", user.getEmployeeId())
                 .claim("userId", user.getId())
                 .claim("fullName", user.getFullName())
                 .claim("role", user.getRole().name())

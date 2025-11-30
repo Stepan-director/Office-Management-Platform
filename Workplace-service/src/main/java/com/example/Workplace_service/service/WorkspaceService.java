@@ -47,7 +47,6 @@ public class WorkspaceService {
 
         return savedWorkspace;
 
-
     }
 
     // посмотреть все места
@@ -55,8 +54,9 @@ public class WorkspaceService {
         return workspaceRepository.findAll();
     }
 
+    // удаление рабочего места
     public void deleteWorkspace(String workplaceId){
-
+        
         Workspace workspace = workspaceRepository.findByWorkplaceId(workplaceId).orElseThrow(()
         -> new RuntimeException("Место с номером: " + workplaceId + " не найдено"));
 

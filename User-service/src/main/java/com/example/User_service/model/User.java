@@ -32,7 +32,10 @@ public class User { // надо будет сделать измение име�
     @Column(name = "created_at")
     private LocalDateTime createdAt; // это передадётся из auth service
 
-    public User(Long id, String employeeId, String fullName, Role role, boolean active, String email, String phone, LocalDateTime createdAt) {
+    @Column(name = "workplace_id", nullable = false)
+    private String workplaceId;
+
+    public User(Long id, String employeeId, String fullName, Role role, boolean active, String email, String phone, LocalDateTime createdAt, String workplaceId) {
         this.id = id;
         this.employeeId = employeeId;
         this.fullName = fullName;
@@ -41,6 +44,7 @@ public class User { // надо будет сделать измение име�
         this.email = email;
         this.phone = phone;
         this.createdAt = createdAt;
+        this.workplaceId = workplaceId;
     }
 
     public User() {
@@ -108,5 +112,13 @@ public class User { // надо будет сделать измение име�
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getWorkplaceId() {
+        return workplaceId;
+    }
+
+    public void setWorkplaceId(String workplaceId) {
+        this.workplaceId = workplaceId;
     }
 }
