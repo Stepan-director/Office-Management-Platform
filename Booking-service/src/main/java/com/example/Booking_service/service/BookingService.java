@@ -4,7 +4,9 @@ import com.example.Booking_service.dto.BookingCreatedEvent;
 import com.example.Booking_service.dto.CreateBookingRequest;
 import com.example.Booking_service.model.Booking;
 import com.example.Booking_service.model.Status;
+import com.example.Booking_service.model.WorkplaceInventory;
 import com.example.Booking_service.repository.BookingRepository;
+import com.example.Booking_service.repository.WorkplaceInventoryRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -23,6 +25,9 @@ public class BookingService {
     private BookingRepository bookingRepository;
 
     @Autowired
+    private WorkplaceInventoryRepository workplaceInventoryRepository;
+
+    @Autowired
     private KafkaTemplate<String, Object> kafkaTemplate;
 
     private static final String USER_BOOKING_TOPIC = "user-booking-topic";
@@ -36,26 +41,53 @@ public class BookingService {
         Jwt jwt = (Jwt) authentication.getPrincipal();
         String employeeId = jwt.getClaimAsString("employeeId");
 
-        // проверка свободно ли место
-        if(request.getStatus() == Status.Booked){
-            throw new RuntimeException("Место с номером: " + request.getWorkplaceId() + " занят");
+        WorkplaceInventory inventory = workplaceInventoryRepository.findByWorkplaceId(request.getWorkplaceId())
+                .orElseThrow(() -> new RuntimeException("Данное рабочее место не найдено в инвентаре."));
+
+        // ПРОВЕРКА СВОБОДЕН ЛИ СЛОТ В БД
+        if(inventory.getStatus() == Status.Booked){
+            throw new RuntimeException("Место с номером: " + request.getWorkplaceId() + " уже занято");
         }
 
-        // проврека существует ли это место на самом деле или ошибка на фронте
-        if(!bookingRepository.existsByWorkplaceId(request.getWorkplaceId())){
-            throw new RuntimeException("Данное место не существует. Приносим извинения!");
+        if (!request.getEndBooking().isAfter(request.getStartBooking())) {
+            throw new RuntimeException("Время окончания должно быть позже времени начала");
+        }
+
+        if (request.getDate().isBefore(LocalDate.now())) {
+            throw new RuntimeException("Нельзя бронировать на прошедшую дату");
+        }
+
+        if (request.getDate().isEqual(LocalDate.now()) &&
+                request.getStartBooking().isBefore(LocalTime.now())) {
+            throw new RuntimeException("Нельзя бронировать на прошедшее время");
+        }
+
+        boolean conflict = bookingRepository.isTimeSlotBooked(
+                request.getWorkplaceId(),
+                request.getDate(),
+                request.getStartBooking(),
+                request.getEndBooking()
+        );
+        if(conflict){
+            throw new RuntimeException("Место " + request.getWorkplaceId() + " уже занято в указанный временной интервал и дату.");
         }
 
         // бронируем место
         Booking booking = new Booking();
+
+        // переносим данные из инвентаря в транзакцию бронирования
+        booking.setWorkplaceId(inventory.getWorkplaceId());
+        booking.setFloor(inventory.getFloor());
+
+        // заполняем остальные поля бронирования
         booking.setEmployeeId(employeeId);
-        booking.setWorkplaceId(request.getWorkplaceId());
-        booking.setFloor(request.getFloor());
         booking.setStatus(Status.Booked);
-        booking.setDate(LocalDate.now());
-        booking.setStartBooking(LocalTime.now());
+        booking.setDate(request.getDate());
+        booking.setStartBooking(request.getStartBooking());
         booking.setEndBooking(request.getEndBooking());
 
+
+        // Сохраняем новую запись в таблице Booking
         Booking bookingSaved = bookingRepository.save(booking);
 
         BookingCreatedEvent event = new BookingCreatedEvent(
@@ -73,11 +105,9 @@ public class BookingService {
 
         return bookingSaved;
 
-
-
     }
 
-    // отмена брони
+    // отмена брони -
     @Transactional
     public Booking cancellationBooking(CreateBookingRequest request){
         // проверка занято ли место перед тем как его освободить
@@ -103,7 +133,7 @@ public class BookingService {
 
     }
 
-    // продлить бронь
+    // продлить бронь -
     @Transactional
     public Booking extendBooking(CreateBookingRequest request){
 

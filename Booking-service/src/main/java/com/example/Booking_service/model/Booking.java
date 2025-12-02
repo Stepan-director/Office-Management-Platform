@@ -14,7 +14,7 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "employee_id", nullable = true) // исравить на employeeId
+    @Column(name = "employee_id", nullable = true)
     private String employeeId; // личный табельный номер из auth service
 
     @Column(name = "workplace_id", nullable = false)
@@ -27,10 +27,10 @@ public class Booking {
 
     private LocalDate date; // дата брони места
 
-    @Column(name = "start_booking", nullable = false)
+    @Column(name = "start_booking")
     private LocalTime startBooking; // начало брони
 
-    @Column(name = "end_booking", nullable = false)
+    @Column(name = "end_booking")
     private LocalTime endBooking; // конец брони
 
     public Booking(Long id, String employeeId, String workplaceId, int floor, Status status, LocalDate date, LocalTime startBooking, LocalTime endBooking) {

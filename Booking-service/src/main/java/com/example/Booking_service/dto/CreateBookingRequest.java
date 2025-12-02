@@ -2,6 +2,7 @@ package com.example.Booking_service.dto;
 
 import com.example.Booking_service.model.Status;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 // это будет на фронтенде
@@ -10,14 +11,16 @@ public class CreateBookingRequest {
     private String workplaceId;
     private int floor;
     private Status status;
+    private LocalDate date;
     private LocalTime startBooking;
     private LocalTime endBooking;
 
-    public CreateBookingRequest(String employeeId, String workplaceId, int floor, Status status, LocalTime startBooking, LocalTime endBooking) {
+    public CreateBookingRequest(String employeeId, String workplaceId, int floor, Status status, LocalDate date, LocalTime startBooking, LocalTime endBooking) {
         this.employeeId = employeeId;
         this.workplaceId = workplaceId;
         this.floor = floor;
         this.status = status;
+        this.date = date;
         this.startBooking = startBooking;
         this.endBooking = endBooking;
     }
@@ -47,6 +50,14 @@ public class CreateBookingRequest {
 
     public void setFloor(int floor) {
         this.floor = floor;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
     public LocalTime getStartBooking() {
