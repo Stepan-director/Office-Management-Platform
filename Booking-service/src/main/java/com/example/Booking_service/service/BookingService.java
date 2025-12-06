@@ -109,51 +109,43 @@ public class BookingService {
 
     // отмена брони -
     @Transactional
-    public Booking cancellationBooking(CreateBookingRequest request){
-        // проверка занято ли место перед тем как его освободить
-        if(request.getStatus() == Status.Free){
-            throw new RuntimeException("Место с номеров " + request.getWorkplaceId() + " свободен.");
+    public void cancellationBooking(String workplaceId){
+
+        // получаем userId из jwt токена
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        String employeeId = jwt.getClaimAsString("employeeId");
+
+        Booking booking = bookingRepository.findByWorkplaceId(workplaceId).orElseThrow(
+                () -> new RuntimeException("Брони не существует!"));
+
+        if(!booking.getEmployeeId().equals(employeeId)){
+             throw new RuntimeException("Вы не можете отменить чужую бронь!");
         }
 
-        // проверка сущетсвует ли место на самом деле
-        if(!bookingRepository.existsByWorkplaceId(request.getWorkplaceId())){
-            throw new RuntimeException("Данное место не существует. Приносим извинения!");
-        }
-
-        Booking booking = bookingRepository.findByWorkplaceIdAndEmployeeIdAndStatus(request.getWorkplaceId(), request.getEmployeeId(), Status.Booked)
-                .orElseThrow(() -> new RuntimeException("Активная бронь на место "
-                        + request.getWorkplaceId() + " не найдена"));
-
-        booking.setStatus(Status.Free);
-        booking.setDate(null);
-        booking.setStartBooking(null);
-        booking.setEndBooking(null);
-
-        return bookingRepository.save(booking);
+        bookingRepository.delete(booking);
 
     }
 
-    // продлить бронь -
+    // изменить бронь -
     @Transactional
     public Booking extendBooking(CreateBookingRequest request){
 
-        // проверка занято ли место перед тем как его продлить
-        if(request.getStatus() == Status.Free){
-            throw new RuntimeException("Место с номеров " + request.getWorkplaceId() + " свободен. Продление невозможно");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        String employeeId = jwt.getClaimAsString("employeeId");
+
+        Booking booking = bookingRepository.findByWorkplaceId(request.getWorkplaceId()).orElseThrow(
+                () -> new RuntimeException("Брони не существует!"));
+
+        if(!booking.getEmployeeId().equals(employeeId)){
+            throw new RuntimeException("Вы не можете изменить чужую бронь!");
         }
 
-        // проверка сущетсвует ли место на самом деле
-        if(!bookingRepository.existsByWorkplaceId(request.getWorkplaceId())){
-            throw new RuntimeException("Данное место не существует. Приносим извинения!");
-        }
-
-        Booking booking = bookingRepository.findByWorkplaceIdAndEmployeeIdAndStatus(request.getWorkplaceId(), request.getEmployeeId(), Status.Booked)
-                .orElseThrow(() -> new RuntimeException("Активная бронь на место "
-                        + request.getWorkplaceId() + " не найдена"));
-
-
-        // продливаем бронь
-        booking.setEndBooking(request.getEndBooking()); // новое время окончания
+        // изменяем параметры брони
+        booking.setDate(request.getDate());
+        booking.setStartBooking(request.getStartBooking());
+        booking.setEndBooking(request.getEndBooking());
 
         return bookingRepository.save(booking);
     }

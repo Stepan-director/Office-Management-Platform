@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class UserService {
 
@@ -26,7 +28,7 @@ public class UserService {
         user.setFullName(request.getFullName());
         user.setRole(request.getRole());
         user.setActive(request.isActive());
-        user.setCreatedAt(request.getCreatedAt());
+        user.setCreatedAt(LocalDateTime.now());
         // email и phone заполнятся специалистом
         return userRepository.save(user);
     }

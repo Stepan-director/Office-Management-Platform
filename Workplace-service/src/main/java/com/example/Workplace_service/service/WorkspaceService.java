@@ -28,7 +28,7 @@ public class WorkspaceService {
     public Workspace createWorkspace(CreateWorkplaceRequest request){
 
         if(workspaceRepository.existsByWorkplaceId(request.getWorkplaceId())){
-            throw new RuntimeException("Место с ID " + request.getWorkplaceId() + " уже сущетсвует");
+            throw new RuntimeException("Место с ID " + request.getWorkplaceId() + " уже существует");
         }
         Workspace workspace = new Workspace();
         workspace.setWorkplaceId(request.getWorkplaceId());
@@ -55,6 +55,7 @@ public class WorkspaceService {
     }
 
     // удаление рабочего места
+    // подрубить кафка
     public void deleteWorkspace(String workplaceId){
         
         Workspace workspace = workspaceRepository.findByWorkplaceId(workplaceId).orElseThrow(()
@@ -62,9 +63,6 @@ public class WorkspaceService {
 
         workspaceRepository.deleteWorkspace(workplaceId);
     }
-
-
-
 
 }
 
